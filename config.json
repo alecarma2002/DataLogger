@@ -1,0 +1,13 @@
+{
+  "selectedDet": [
+    {
+      "module": 11,
+      "channel": 1
+    },
+    {
+      "module": 11,
+      "channel": 2
+    }
+  ],
+  "LoggerEnabled": true
+}

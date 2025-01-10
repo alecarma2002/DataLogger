@@ -1,0 +1,22 @@
+{
+  "name": "datalogger",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "npm i && npm fund && npm audit && sudo mkdir Logs && sudo mkdir temp && npm start && echo Application started",
+    "start": "pm2 start main.js && pm2 save",
+    "stop" : "pm2 stop main.js",
+    "kill" : "pm2 delete main.js && pm2 save"
+  },
+  "author": "it",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^4.21.1",
+    "fs": "^0.0.1-security",
+    "modbus-serial": "^8.0.17",
+    "path": "^0.12.7",
+    "pm2": "^5.4.3"
+  }
+}

@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url("images/consiliumLogo.webp");
+}
+
+h1 {
+    color: #333333; /* Dark Gray */
+    text-align: center;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+h3 {
+    color: #333333; /* Dark Gray */
+    text-align: center;
+}
+
+.upper_part {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.outher_container, .select_area {
+    width: 50%;
+    background-color: #f0f0f0; /* Light Gray */
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.inner_container, .inner_select_area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.container_inside {
+    width: 300px;
+    color: #333333; /* Dark Gray */
+}
+
+.status_box {
+    min-width: 110px;
+    background-color: #ff0000cf;
+    border: 3px solid #333333; /* Dark Gray */
+    text-align: center;
+    padding: 10px;
+    color: #FFFFFF; /* White */
+    border-radius: 5px;
+}
+
+.button {
+    width: 75px;
+    height: 35px;
+    margin-left: 30px;
+    border: 2px solid #FF6600; /* Orange */
+    background-color: #FF6600; /* Orange */
+    color: #FFFFFF; /* White */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.button:hover {
+    background-color: #FF4500; /* Darker Orange */
+    color: #FFFFFF; /* White */
+}
+
+label, select {
+    margin: 10px;
+    color: #003366; /* Dark Blue */
+}
+
+table {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #333333; /* Dark Gray */
+}
+
+th {
+    background-color: #333333; /* Dark Gray */
+    color: #FFFFFF; /* White */
+}
+
+tr:nth-child(even) {
+    background-color: #f0f0f0; /* Light Gray */
+}
+
+tr:nth-child(odd) {
+    background-color: #aac5e1; /* Light Gray */
+}

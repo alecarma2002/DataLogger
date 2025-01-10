@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Datalogger</title>
+    <link rel="stylesheet" href="style.css" />    
+  </head>
+  <body>
+    <script src="script.js" type="text/javascript" defer></script>
+    
+    <h1>Consilium DataLogger</h1>
+
+    <div class="upper_part">
+
+      <div class="outher_container" id="statusBox">
+
+        <h3>General status</h3>
+
+        <div class="inner_container">
+          <p class="container_inside">CGD50/500 connection status</p>
+          <div class="status_box" id="connectionStatus">Not Connected</div>
+        </div>
+        
+        <div class="inner_container">
+          <p class="container_inside">Logger status</p>
+          <div class="status_box" id="logStatus">Failure</div>
+          <button class="button" id="loggerButton">Start</button>
+          <a href="/downloadLog" download class="button">Download Log</a>
+        </div>
+
+      </div>
+
+      <div class="select_area" id="DetSelect">
+
+        <h3>Detector Selection</h3>
+        
+        <div class="inner_select_area">
+
+          <div class="inner_cointainer">
+            <label for="moduleSelect">Select module address:  </label>
+            <select name="moduleSelect" id="moduleSelection">
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+            </select>
+          </div>
+
+          <div class="inner_cointainer">
+            <label for="channelSelect">Select module channel:  </label>
+            <select name="channelSelect" id="channelSelection">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="inner_select_area" id="detSelectButtonArea">
+          <button class="button" id="addDetButton">Add</button>
+          <button class="button" id="remDetButton">Remove</button>
+        </div>
+
+                
+      
+      </div>
+
+    </div>
+
+    <div class="lower_part">
+      <table id="valueTable">
+        <tr>
+          <th>Module Address</th>
+          <th>Module Channel</th>
+          <th>Detector status</th>
+          <th>Detector Value</th>
+        </tr>
+      </table>
+    </div>
+
+    
+
+  </body>
+</html>
