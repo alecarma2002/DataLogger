@@ -154,23 +154,5 @@ loggerButton.addEventListener("click", async function() {
 });
 
 logDownload.addEventListener("click", function() {
-    fetch('/downloadLog')
-        .then(response => {
-            if (response.ok) {
-                return response.blob(); 
-            } else {
-                throw new Error('Download failed');
-            }
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'logFiles.zip'; 
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            console.error('Download failed:', error);
-        });
+    window.open("http://datalogger:3000/downloadLog")
 });
