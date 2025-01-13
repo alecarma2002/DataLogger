@@ -3,6 +3,9 @@ body {
     margin: 0;
     padding: 0;
     background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url("images/consiliumLogo.webp");
+    background-size: cover;
+    background-position: center;
+    color: #333333; /* Dark Gray */
 }
 
 h1 {
@@ -10,37 +13,45 @@ h1 {
     text-align: center;
     padding: 30px;
     background-color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: bold;
 }
 
 h3 {
     color: #333333; /* Dark Gray */
     text-align: center;
+    margin: 15px 0;
 }
 
 .upper_part {
     display: flex;
     gap: 20px;
-    padding: 20px;
+    flex-wrap: wrap;
+    margin-left:2%;
+    margin-right: 2%;
+
 }
 
 .outher_container, .select_area {
-    width: 50%;
+    width: 47%;
     background-color: #f0f0f0; /* Light Gray */
     border-radius: 20px;
-    padding: 20px;
+    padding: 1%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .inner_container, .inner_select_area {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 20px 0;
+    margin: 15px 0;
 }
 
 .container_inside {
     width: 300px;
-    color: #333333; /* Dark Gray */
+    font-size: 1.1rem;
 }
 
 .status_box {
@@ -62,17 +73,30 @@ h3 {
     color: #FFFFFF; /* White */
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    
 }
 
 .button:hover {
     background-color: #FF4500; /* Darker Orange */
     color: #FFFFFF; /* White */
+    transform: scale(1.05);
 }
+
+.button:active {
+    transform: scale(0.98); /* Slightly shrink the button when pressed */
+    background-color: #FF4500; /* Darker Orange */
+}
+
 
 label, select {
     margin: 10px;
     color: #003366; /* Dark Blue */
+}
+
+select {
+    padding: 5px;
+    font-size: 1rem;
 }
 
 table {
@@ -85,6 +109,7 @@ table {
 th, td {
     padding: 10px;
     border: 1px solid #333333; /* Dark Gray */
+    font-size: 1rem;
 }
 
 th {
@@ -99,3 +124,35 @@ tr:nth-child(even) {
 tr:nth-child(odd) {
     background-color: #aac5e1; /* Light Gray */
 }
+
+
+/* Add this section at the end of your CSS for responsiveness */
+
+@media (max-width: 768px) {
+    .upper_part {
+        flex-direction: column; /* Stack elements vertically on small screens */
+    }
+
+    .outher_container, .select_area {
+        width: 98%; 
+        margin-bottom: 20px; /* Add space between containers */
+    }
+
+    .inner_container {
+        flex-direction: column; /* Stack items vertically within the inner container */
+        align-items: center; /* Align items to the left */
+    }
+
+    .button {
+        width: 80%; /* Make buttons full width on small screens */
+        margin-left: 1%;
+        margin-right:1%;
+        margin-top: 10px; /* Add space between buttons */
+    }
+
+    .inner_select_area {
+        flex-direction: column; /* Stack select elements vertically */
+        align-items: center; /* Align select boxes to the left */
+    }
+}
+

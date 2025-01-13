@@ -3,9 +3,12 @@ const source = new EventSource('/serverData');
 let tableBody = document.getElementById('valueTable');
 let connectionStatus = document.getElementById('connectionStatus');
 let logStatus = document.getElementById('logStatus');
+
 let addDetButton = document.getElementById('addDetButton');
 let remDetButton = document.getElementById('remDetButton');
 let loggerButton = document.getElementById('loggerButton');
+let logDownload = document.getElementById('downloadLogButton');
+
 
 source.onmessage = function(event) {  
     const data = JSON.parse(event.data);
@@ -148,4 +151,26 @@ loggerButton.addEventListener("click", async function() {
         }
     }
     
+});
+
+logDownload.addEventListener("click", function() {
+    fetch('/downloadLog')
+        .then(response => {
+            if (response.ok) {
+                return response.blob(); 
+            } else {
+                throw new Error('Download failed');
+            }
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'logFiles.zip'; 
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+        });
 });

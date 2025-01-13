@@ -165,7 +165,7 @@ async function getValues() {
                     result.status.LoggerStatus = "Failure";
                     result.status.LoggerLog = err.message;
                 }
-            }else{
+            }else if(result.status.LoggerStatus != "Stopped"){
                 result.status.LoggerStatus = "Not Running";
             }
             result.status.ModbusConnection = "Connected";
