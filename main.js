@@ -3,6 +3,7 @@ const ModbusRTU =require('modbus-serial');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const logger = require('./utils/logger.js');
 
 const modbusUpdateInterval = 1000; 
 const retryDelay = 2000; 
@@ -43,13 +44,13 @@ function loadConfig(path) {
         fs.readFile(path, (err, data) => {
             if (err) {
                 if (err.code === 'ENOENT') {
-                    console.error("Config file not found, using default.");
+                    logger.log("DEBUG","Config file not found, using default.");
                     fs.writeFile(path, JSON.stringify(defaultConfig, null, 2), (writeErr) => {
                         if (writeErr) {
-                            console.error('Error writing default config:', writeErr);
+                            logger.log("ERROR",'Failed to create default config:', writeErr);
                             reject(writeErr);
                         } else {
-                            console.log('Default config created.');
+                            logger.log("DEBUG",'Default config created.');
                             resolve(defaultConfig);
                         }
                     });
@@ -61,7 +62,7 @@ function loadConfig(path) {
                     const parsedConfig = JSON.parse(data);
                     resolve(parsedConfig);
                 } catch (parseErr) {
-                    console.error('Error parsing config, using default:', parseErr);
+                    logger.log("ERROR",'Failed to parse config, using default:', parseErr);
                     resolve({ selectedDet: [] });
                 }
             }
@@ -72,31 +73,29 @@ function loadConfig(path) {
 async function initializeConfig(path) {
     try {
         config = await loadConfig(path);
-        console.log("Config loaded successfully.");
+        logger.log("DEBUG","Config loaded successfully.");
         result.status.LoggerStatus = "initializing"
     } catch (err) {
-        console.error("Error initializing config:", err);
+        logger.log("ERROR","Cannot load config:", err);
     }
 }
 
-
-
 function inizializeWebServer() {
-    app.listen(serverPort, () => console.log('Web interface hosted on port: ', serverPort));
+    app.listen(serverPort, () => logger.log("DEBUG",'Web interface hosted on port: ', serverPort));
     app.use(express.static('/datalogger/public'));
     app.use(express.json());
 }
 
 async function connectModbus() {
     try {
-        console.log("Attempting Modbus connection...");
+        logger.log("DEBUG","Attempting Modbus connection...");
         await client.connectRTUBuffered("/dev/ttyUSB0", { baudRate: 9600 });
-        console.log("Modbus connected!");
+        logger.log("DEBUG","Modbus connected!");
         result.status.ModbusConnection = "Connected";
         clearInterval(connectionRetry); 
         startDataPolling(); 
     } catch (err) {
-        console.error("Connection error:", err.message);
+        logger.log("ERROR","Unable to connect to Modbus device:", err.message);
         result.status.ModbusConnection = "Connection error";
         result.status.ModbusLog = err.message;
 
@@ -111,7 +110,7 @@ async function startDataPolling() {
         try {
             await getValues();
         } catch (err) {
-            console.error("Error while polling Modbus data:", err.message);
+            logger.log("ERROR","Failed to retreive data from MOdbus Device ", err.message);
             if(err.message == "Port Not Open"){
                 clearInterval(polling);
                 connectModbus();
@@ -170,7 +169,7 @@ async function getValues() {
             }
             result.status.ModbusConnection = "Connected";
         } catch (err) {
-            console.error(`Error reading values for module ${module}, channel ${channel}:`, err.message);
+            logger.log("ERROR",`Failed to read values for module ${module}, channel ${channel}:`, err.message);
             if(err.message == "Port Not Open"){
                 result.status.ModbusConnection = "Connection error";
             }else if (err.message == "Modbus response timed out"){
@@ -216,7 +215,7 @@ function saveToDB(val){
         const content = formattedDate + "," + val.module + "," + val.channel + "," + val.status + "," + val.value + ";\n"
         fs.appendFile(`${logFilePath}/${year}-${month}-${day}.txt` , content.toString(),(err)=>{});
     }catch(e){
-        console.log(e)
+        logger.log("ERROR",e);
     }
 }
 
@@ -239,22 +238,26 @@ function prepLogZip(){
                 });
                 fs.rename(tzipPath, zipPath, (err) => {
                     if (err) throw err;
-                    console.log('Zip folder updated');
+                    logger.log("DEBUG",'Zip folder updated');
                 });
             });
             
         } catch (e) {
-            console.log("Could not update zip folder");
-            console.log(e)
+            logger.log("ERROR","Could not update zip folder",e);
+            
         }
     }, logZipInterval);
 }
     
-
+logger.logLevel("DEBUG")
 initializeConfig(configFilePath);
 inizializeWebServer();
 connectModbus();
 prepLogZip();
+
+
+
+
     
 
 // API Endpoints
@@ -285,9 +288,9 @@ app.post('/setting', (req, res) =>{
         const exists = config.selectedDet.some((det) => det.module === newDet.module && det.channel === newDet.channel);
             
         if (exists) {
-            console.log("Detector already exists:", newDet);
+            logger.log("DEBUG","Detector already exists:", newDet);
         } else {
-            console.log("Detector does not exist, adding it.");
+            logger.log("DEBUG","Detector does not exist, adding it.");
             config.selectedDet.push(newDet);
         }
     }
@@ -297,21 +300,21 @@ app.post('/setting', (req, res) =>{
         const exists = config.selectedDet.some((det) => det.module === newDet.module && det.channel === newDet.channel);
             
         if (exists) {
-            console.log("Removing Detector:", newDet);
+            logger.log("DEBUG","Removing Detector:", newDet);
             config.selectedDet = config.selectedDet.filter((det) => !(det.module === newDet.module && det.channel === newDet.channel));
         } else {
-            console.log("Detector does not exist");
+            logger.log("DEBUG","Detector does not exist");
         }
     }
     
     if(req.body.logMode == true){
         config.LoggerEnabled = true;
-        console.log("Logger Enabled");
+        logger.log("DEBUG","Logger Enabled");
     }
     if(req.body.logMode == false){
         config.LoggerEnabled = false;
         result.status.LoggerStatus = "Stopped";
-        console.log("Logger Stopped");
+        logger.log("DEBUG","Logger Stopped");
     }
     config.selectedDet.sort((a, b) => {
 
@@ -324,9 +327,9 @@ app.post('/setting', (req, res) =>{
     res.end();
     fs.writeFile(configFilePath, JSON.stringify(config, null, 2), (err) => {
         if (err) {
-            console.error('Error writing configuration file:', err);
+            logger.log("ERROR",'Failed to writie configuration file:', err);
         } else {
-            console.log('Configuration file saved successfully!');
+            logger.log("DEBUG",'Configuration file saved successfully!');
         }
     })
 });
@@ -334,7 +337,7 @@ app.post('/setting', (req, res) =>{
 app.get('/downloadLog', (req, res) => {
     res.download(path.join(__dirname, 'temp/Logs.zip'), 'temp/Logs.zip', (err) => {
       if (err) {
-        console.error('Error sending ZIP file:', err.message);
+        logger.log("ERROR",'Failed to send ZIP file:', err.message);
         res.status(500).send('Error sending file');
       } else {
         
