@@ -3,13 +3,14 @@ const ModbusRTU =require('modbus-serial');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
-const logger = require('./utils/logger.js');
+const logger = require('./components/logger.js');
 
 const modbusUpdateInterval = 1000; 
 const retryDelay = 2000; 
 const replyTimeout = 500;
 const configFilePath = './config.json';
-const logFilePath = '/datalogger/Logs';
+const valueLogFilePath = path.join(__dirname,'Logs/Value_Logs');
+const valueLogZipPath =path.join(__dirname,'temp/Value_Logs.zip');
 const client = new ModbusRTU();
 const app = express();
 const serverPort = 3000;
@@ -37,7 +38,7 @@ let result = {
 let connectionRetry;
 
 
-
+//logger.sysLogPath(valueLogFilePath)
 
 function loadConfig(path) {
     return new Promise((resolve, reject) => {
@@ -158,11 +159,12 @@ async function getValues() {
             };
             if(config.LoggerEnabled){
                 try{
-                    saveToDB(tempValues[x]);
+                    logger.saveToFile(tempValues[x],valueLogFilePath);
                     result.status.LoggerStatus = "Running...";
                 }catch(err){
                     result.status.LoggerStatus = "Failure";
                     result.status.LoggerLog = err.message;
+                    logger.log("ERROR",err)
                 }
             }else if(result.status.LoggerStatus != "Stopped"){
                 result.status.LoggerStatus = "Not Running";
@@ -200,31 +202,12 @@ async function readRegister(reg, timeout) {
     ]);
 }
 
-function saveToDB(val){
-    try{
-        const timestamp = Date.now();  
-        const date = new Date(timestamp);  
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');  
-        const day = String(date.getDate()).padStart(2, '0');
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        const second = String(date.getSeconds()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-        const content = formattedDate + "," + val.module + "," + val.channel + "," + val.status + "," + val.value + ";\n"
-        fs.appendFile(`${logFilePath}/${year}-${month}-${day}.txt` , content.toString(),(err)=>{});
-    }catch(e){
-        logger.log("ERROR",e);
-    }
-}
-
 function prepLogZip(){
     setInterval(() => {
         try{
-            const folderPath = path.join(__dirname, 'Logs');
+            const folderPath = path.join(__dirname, 'Logs/Value_Logs');
             const tzipPath = path.join(__dirname, 'temp/tLogs.zip');
-            const zipPath = path.join(__dirname, 'temp/Logs.zip');
+            const zipPath = path.join(__dirname, 'temp/Value_Logs.zip');
             const output = fs.createWriteStream(tzipPath);
             const archive = archiver('zip', { zlib: { level: 9 } });
             
@@ -248,7 +231,7 @@ function prepLogZip(){
         }
     }, logZipInterval);
 }
-    
+console.log(valueLogFilePath)
 logger.logLevel("DEBUG")
 initializeConfig(configFilePath);
 inizializeWebServer();
@@ -335,7 +318,7 @@ app.post('/setting', (req, res) =>{
 });
 
 app.get('/downloadLog', (req, res) => {
-    res.download(path.join(__dirname, 'temp/Logs.zip'), 'temp/Logs.zip', (err) => {
+    res.download(valueLogZipPath, 'Value_Logs.zip', (err) => {
       if (err) {
         logger.log("ERROR",'Failed to send ZIP file:', err.message);
         res.status(500).send('Error sending file');

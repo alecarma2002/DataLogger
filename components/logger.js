@@ -4,6 +4,8 @@ const archiver = require('archiver');
 
 
 let LOGGER_LEVEL = "DEFAULT";
+let SYS_LOG_PATH = path.join(__dirname);
+let SYS_LOG_ENABLED = 0;
 
 
 
@@ -23,12 +25,10 @@ exports.log = (msgLevel,msg1,msg2,msg3,msg4) => {
     
     const MSG = [Msg1,Msg2,Msg3,Msg4].join(" ");
     
-    console.log()
-    
     switch(LOGGER_LEVEL){
         case 'DEFAULT' :
             if(msgLevel == 'DEFAULT'){
-                console.log(MSG)
+                console.log(MSG);
             }
             if(msgLevel == 'ERROR'){
                 console.error("ERROR:  ",MSG);
@@ -37,28 +37,28 @@ exports.log = (msgLevel,msg1,msg2,msg3,msg4) => {
             
         case 'DEBUG' :
             if(msgLevel == 'DEFAULT'){
-                console.log(MSG)
+                console.log(MSG);
             }
             if(msgLevel == 'ERROR'){
                 console.error("ERROR:  ",MSG);
             }
             if(msgLevel == 'DEBUG'){
-                console.log(MSG)
+                console.log(MSG);
             }
             break;
             
         case 'TRACE' :
             if(msgLevel == 'DEFAULT'){
-                console.log(MSG)
+                console.log(MSG);
             }
             if(msgLevel == 'ERROR'){
                 console.error("ERROR:  ",MSG);
             }
             if(msgLevel == 'DEBUG'){
-                console.log(MSG)
+                console.log(MSG);
             }
             if(msgLevel == 'TRACE'){
-                console.log(MSG)
+                console.log(MSG);
             }
             break;
             
@@ -100,3 +100,49 @@ exports.logLevel = (level) => {
     }
 }
 
+exports.saveToFile = (val,path) => {
+    try{
+        const timestamp = Date.now();  
+        const date = new Date(timestamp);  
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');  
+        const day = String(date.getDate()).padStart(2, '0');
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const second = String(date.getSeconds()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+        const content = formattedDate + "," + val.module + "," + val.channel + "," + val.status + "," + val.value + ";\n"
+        fs.appendFile(`${path}/${year}-${month}-${day}.txt` , content.toString(),(err)=>{});
+    }catch(e){
+        this.log("ERROR",e);
+    }
+}
+
+exports.sysLog = (en) => {
+    EN = en || SYS_LOG_ENABLED;
+    
+    
+}
+
+exports.sysLogPath = (path) => {
+    fs.access(path, fs.constants.W_OK, (err) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+            console.error('Path does not exist.');
+            fs.mkdir(path, { recursive: true }, (err) => {
+                if (err) {
+                console.error('Error creating directory:', err);
+                }
+            });
+        } else if (err.code === 'EACCES') {
+          console.error('No write permission.');
+        } else {
+          console.error('An error occurred:', err.message);
+        }
+      } else {
+        console.log('Write permission granted.');
+        SYS_LOG_PATH = path;
+      }
+    });
+}
